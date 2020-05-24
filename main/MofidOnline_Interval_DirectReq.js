@@ -1,6 +1,6 @@
 
 javascript: (function () {
-    var el = document.createElement('div'),
+    var el = document.createElement('div'), yourVolume,
         startTime, stopTime, price, volume, loop, interval, robOrderBtn, per, orderType,
         balance = document.getElementById('lblFullBalance').innerHTML.replace(/,/g, ''),
         highPrice = document.getElementsByClassName('HighAllowedPrice')[0],
@@ -113,16 +113,23 @@ javascript: (function () {
     }
 
     const calcKarmozd = () => {
-        if (orderType == '86') return;
+        if (orderType === '86') return;
         var todayHigh = highPrice.innerHTML.replace(/,/g, '')
         var karmoz = CalcCountAndNewCommission($("#calcIsin").val(), parseInt(orderType).value, balance, todayHigh);
         document.getElementById('rob-pr').value = todayHigh;
         document.getElementById('rob-vol').value = karmoz.Count;
     }
     const changeBtnStyle = e => {
-        e.value == 86 ? (robOrderBtn.style.backgroundColor = 'red', robOrderBtn.innerText = 'درخواست فروش',
-            document.getElementById('rob-pr').value = '', document.getElementById('rob-vol').value = '')
-            : (robOrderBtn.style.backgroundColor = 'green', robOrderBtn.innerText = 'درخواست خرید')
+        var vol = document.getElementById('rob-vol');
+        var pr = document.getElementById('rob-pr');
+        (e.value === '86')
+            ? (robOrderBtn.style.backgroundColor = 'red',
+                robOrderBtn.innerText = 'درخواست فروش',
+                vol.value = yourVolume,
+                pr.value = '')
+            : (robOrderBtn.style.backgroundColor = 'green',
+                robOrderBtn.innerText = 'درخواست خرید',
+                calcKarmozd());
     }
     const initClock = () => {
         startTime = document.getElementById('rob-start');
@@ -142,14 +149,20 @@ javascript: (function () {
         }
     }
     const getShareDetail = (el) => {
-        if (orderType === '65') return;
-        var yourVolume = el.children[2].innerText.replace(/,/g, '');
-        document.getElementById('rob-vol').value = yourVolume;
+        yourVolume = el.children[2].innerText.replace(/,/g, '');
+        if (orderType === '65') {
+            setTimeout(() => {
+                calcKarmozd();
+            }, 400);
+        } else {
+            document.getElementById('rob-vol').value = yourVolume;
+            document.getElementById('rob-pr').value = ''
+        }
     }
     [].forEach.call(document.getElementById('portfolioBody').rows, function (el) {
         el.addEventListener('click', () => getShareDetail(el));
     });
-    document.getElementsByName('ordertype').forEach(x => x.addEventListener('change', (e) => { changeBtnStyle(e.target); orderType = e.target.value }))
+    document.getElementsByName('ordertype').forEach(x => x.addEventListener('change', (e) => { orderType = e.target.value; changeBtnStyle(e.target) }))
     robOrderBtn = document.getElementById('rob-order');
     orderType = document.querySelector('[name=ordertype]:checked').value;
     robOrderBtn.addEventListener('click', () => start(orderType));
