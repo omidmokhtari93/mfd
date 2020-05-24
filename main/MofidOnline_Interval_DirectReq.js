@@ -5,7 +5,7 @@ javascript: (function () {
         balance = document.getElementById('lblFullBalance').innerHTML.replace(/,/g, ''),
         highPrice = document.getElementsByClassName('HighAllowedPrice')[0],
         clockElement = document.getElementById('TimerDiv');
-    el.innerHTML = '<div style="position:fixed;right:200px;bottom:40px;z-index:999;direction:ltr;padding:5px;border:1px #a9a9a9;border-radius:5px;background-color:#d6d6d6"id=rob-div><div style=margin-bottom:3px><input autocomplete=off id=rob-start placeholder=شروع style=text-align:center value=08:29:57></div><div style=margin-bottom:3px><input autocomplete=off id=rob-stop placeholder=پایان style=text-align:center value=08:30:01></div><div style=margin-bottom:3px><input autocomplete=off id=rob-interval placeholder=اینتروال style=text-align:center value=310></div><div style=margin-bottom:3px><input autocomplete=off id=rob-vol placeholder=حجم style=text-align:center></div><div style=margin-bottom:3px><input autocomplete=off id=rob-pr placeholder=قیمت style=text-align:center></div><div style=margin-bottom:3px;direction:rtl><input value=65 name=ordertype type=radio checked>خرید     <input value=86 name=ordertype type=radio>فروش</div><button id=rob-order style="height:40px;width:100%;background-color:green;color:#fff;border:1px solid;cursor:pointer;font-family:inherit"type=button>درخواست خرید</button></div>';
+    el.innerHTML = '<div style="position:fixed;right:200px;bottom:40px;z-index:999;direction:ltr;padding:5px;border:1px #a9a9a9;border-radius:5px;background-color:#d6d6d6"id=rob-div><div style=margin-bottom:3px><input autocomplete=off id=rob-start placeholder=شروع style=text-align:center value=08:29:55></div><div style=margin-bottom:3px><input autocomplete=off id=rob-stop placeholder=پایان style=text-align:center value=08:30:01></div><div style=margin-bottom:3px><input autocomplete=off id=rob-interval placeholder=اینتروال style=text-align:center value=310></div><div style=margin-bottom:3px><input autocomplete=off id=rob-vol placeholder=حجم style=text-align:center></div><div style=margin-bottom:3px><input autocomplete=off id=rob-pr placeholder=قیمت style=text-align:center></div><div style=margin-bottom:3px;direction:rtl><input value=65 name=ordertype type=radio checked>خرید     <input value=86 name=ordertype type=radio>فروش</div><button id=rob-order style="height:40px;width:100%;background-color:green;color:#fff;border:1px solid;cursor:pointer;font-family:inherit"type=button>درخواست خرید</button></div>';
     document.body.appendChild(el);
     const start = (type) => {
         clearInterval(loop);
@@ -125,22 +125,30 @@ javascript: (function () {
             : (robOrderBtn.style.backgroundColor = 'green', robOrderBtn.innerText = 'درخواست خرید')
     }
     const initClock = () => {
-        startTime = document.getElementById('rob-start').value;
-        stopTime = document.getElementById('rob-stop').value;
+        startTime = document.getElementById('rob-start');
+        stopTime = document.getElementById('rob-stop');
         var clk = clockElement.innerText;
         if (clk > '08:30:00' && clk < '12:35:00') {
-            startTime = '12:34:57';
-            stopTime = '12:35:01';
+            startTime.value = '12:34:55';
+            stopTime.value = '12:35:01';
         }
         if (clk > '12:35:00' && clk < '01:40:00') {
-            startTime = '01:39:57';
-            stopTime = '01:40:01';
+            startTime.value = '01:39:55';
+            stopTime.value = '01:40:01';
         }
         if (clk > '01:40:00' && clk < '02:20:00') {
-            startTime = '02:19:57';
-            stopTime = '02:20:01';
+            startTime.value = '02:19:55';
+            stopTime.value = '02:20:01';
         }
     }
+    const getShareDetail = (el) => {
+        if (orderType === '65') return;
+        var yourVolume = el.children[2].innerText.replace(/,/g, '');
+        document.getElementById('rob-vol').value = yourVolume;
+    }
+    [].forEach.call(document.getElementById('portfolioBody').rows, function (el) {
+        el.addEventListener('click', () => getShareDetail(el));
+    });
     document.getElementsByName('ordertype').forEach(x => x.addEventListener('change', (e) => { changeBtnStyle(e.target); orderType = e.target.value }))
     robOrderBtn = document.getElementById('rob-order');
     orderType = document.querySelector('[name=ordertype]:checked').value;
