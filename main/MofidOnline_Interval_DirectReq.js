@@ -148,8 +148,10 @@ javascript: (function () {
             stopTime.value = '02:20:01';
         }
     }
-    const getShareDetail = (el) => {
-        yourVolume = el.children[2].innerText.replace(/,/g, '');
+    const getShareDetail = (el, table) => {
+        table == 'tblwatchListBody'
+            ? (yourVolume = 'ناموجود')
+            : (yourVolume = el.children[2].innerText.replace(/,/g, ''))
         if (orderType === '65') {
             setTimeout(() => {
                 calcKarmozd();
@@ -159,13 +161,22 @@ javascript: (function () {
             document.getElementById('rob-pr').value = ''
         }
     }
-    [].forEach.call(document.getElementById('portfolioBody').rows, function (el) {
-        el.addEventListener('click', () => getShareDetail(el));
-    });
+    const initPortfoAndWatchlistTable = e => {
+        var tbl = e == 'portfo' ? 'portfolioBody' : 'tblwatchListBody';
+        setTimeout(() => {
+            [].forEach.call(document.getElementById(tbl).rows, function (el) {
+                el.addEventListener('click', () => getShareDetail(el, tbl));
+            });
+        }, 300);
+    }
     document.getElementsByName('ordertype').forEach(x => x.addEventListener('change', (e) => { orderType = e.target.value; changeBtnStyle(e.target) }))
     robOrderBtn = document.getElementById('rob-order');
     orderType = document.querySelector('[name=ordertype]:checked').value;
     robOrderBtn.addEventListener('click', () => start(orderType));
     highPrice.addEventListener('click', calcKarmozd);
+    document.querySelector('[key="portfolioDiv"]').addEventListener('click', () => initPortfoAndWatchlistTable('portfo'))
+    document.querySelector('[key="watchListDiv"]').addEventListener('click', () => initPortfoAndWatchlistTable('watchlist'))
     initClock();
+    initPortfoAndWatchlistTable('portfo');
+    calcKarmozd();
 })();
