@@ -1,5 +1,5 @@
 javascript: (function () {
-    var el = document.createElement('div'), yourVolume,
+    var el = document.createElement('div'), yourVolume, loadingInterval,
         startTime, stopTime, price, volume, loop, interval, robOrderBtn, per, orderType,
         balance = document.getElementsByClassName('customerBalance_Account')[0].innerHTML.replace(/,/g, ''),
         highPrice = document.getElementById('dailyslider_Hight'),
@@ -28,7 +28,7 @@ javascript: (function () {
             }, 1);
         }
     }
-    
+
     const fnCallBack = e => {
         !e.IsSuccessfull && ((orderType == '65' ? robOrderBtn.innerHTML = 'درخواست خرید' : robOrderBtn.innerHTML = 'درخواست فروش'))
         console.log(clockElement.innerText, " | " + Math.round(performance.now() - per) + "MS | ", e.Data);
@@ -110,22 +110,26 @@ javascript: (function () {
     const getShareDetail = (el, table) => {
         table == 1
             ? (yourVolume = 'ناموجود')
-            : (yourVolume = el.firstChild.children[1].innerText.replace(/,/g, ''))
+            : (yourVolume = el.innerText.replace(/,/g, ''))
         if (orderType === '65') {
             setTimeout(() => {
                 calcKarmozd();
             }, 500);
         } else {
-            document.getElementById('rob-vol').value = yourVolume;
+            document.getElementById('rob-vol').value = yourVolum;
             document.getElementById('rob-pr').value = ''
         }
     }
     const initPortfoAndWatchlistTable = e => {
-        setTimeout(() => {
-            [].forEach.call(document.getElementsByClassName('newGrid-container')[e].children, function (el) {
-                el.addEventListener('click', () => getShareDetail(el, e));
-            });
-        }, 500);
+        clearInterval(loadingInterval)
+        loadingInterval = setInterval(() => {
+            document.getElementsByClassName('newGrid-container')[e]
+                .children[0].children[0].children[e == 0 ? 11 : 8].innerText != "" &&
+                (Array.from(document.getElementsByClassName('newGrid-container')[e].children).forEach(function (el) {
+                    el.firstChild.addEventListener('click', () => getShareDetail(el.firstChild.children[1], e));
+                }), clearInterval(loadingInterval))
+        }, 300);
+
     }
     document.getElementsByName('ordertype').forEach(x => x.addEventListener('change', (e) => { orderType = e.target.value; changeBtnStyle(e.target) }))
     robOrderBtn = document.getElementById('rob-order');
